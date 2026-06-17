@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conductor and dielectric loss: coax, microstrip, CPW</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{--ink:#16202e;--muted:#56657a;--line:#e3e8ef;--line2:#cdd5e0;--head:#eef2f7;--zebra:#f7fafc;--accent:#0d7d74;--num:#0f1b2d;--cu:#b4531f;--ag:#5b6b7d;--au:#b8902a;}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;padding:42px 22px 90px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);line-height:1.55;background:#fff;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1040px;margin:0 auto}
+  h1{font-size:1.7rem;margin:0 0 6px;letter-spacing:-.01em}
+  h2{font-size:1.2rem;margin:38px 0 4px}
+  h2 .sub{font-weight:400;color:var(--muted);font-size:.9rem}
+  p.intro{color:var(--muted);max-width:840px;margin:6px 0 0}
+  p.note{color:var(--muted);font-size:.87rem;max-width:880px;margin:9px 0 0}
+  .scroll{overflow-x:auto;margin-top:13px;border:1px solid var(--line);border-radius:11px}
+  table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:560px}
+  th,td{padding:9px 13px;text-align:left;vertical-align:middle;border-bottom:1px solid var(--line)}
+  thead th{background:var(--head);border-bottom:2px solid var(--line2);font-size:.78rem;text-transform:uppercase;letter-spacing:.03em;color:#42526a;white-space:nowrap}
+  thead th.nc{text-transform:none}
+  th .u{display:block;font-weight:400;font-size:.72rem;text-transform:none;letter-spacing:0;color:#7a8699;margin-top:2px}
+  tbody tr:nth-child(even){background:var(--zebra)}
+  td.num{font-variant-numeric:tabular-nums;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;white-space:nowrap;color:var(--num)}
+  td.eq{font-size:1rem}
+  .metal{font-weight:700}
+  .frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .2em}
+  .frac>.n{padding:0 .5em 1px;border-bottom:1.6px solid currentColor}
+  .frac>.d{padding:1px .5em 0}
+  .rad-sign{font-size:1.7em;line-height:1;vertical-align:-.16em;margin:0 .08em;font-weight:300}
+  sub,sup{font-size:.72em}
+  a{color:var(--accent)}
+  .panel{margin-top:16px;border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--zebra)}
+  .ctrls{display:flex;flex-wrap:wrap;gap:18px 28px;align-items:flex-end}
+  .cgrp{display:flex;flex-direction:column;gap:6px}
+  .cgrp .lab{font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#42526a}
+  .seg{display:inline-flex;gap:3px;background:#e7ecf2;border-radius:8px;padding:3px}
+  .seg button{border:none;background:transparent;padding:6px 12px;border-radius:6px;font:inherit;font-size:.84rem;font-weight:600;color:var(--muted);cursor:pointer}
+  .seg button.on{background:var(--accent);color:#fff}
+  .chk{display:inline-flex;gap:12px;align-items:center}
+  .chk label{display:inline-flex;gap:5px;align-items:center;font-size:.86rem;font-weight:600;cursor:pointer}
+  input[type=range]{width:180px}
+  .sizeval{font-family:ui-monospace,monospace;font-size:.82rem;color:var(--ink)}
+  .chartbox{position:relative;height:460px;margin-top:14px}
+  .refs{margin-top:14px;padding-left:0;list-style:none}
+  .refs li{margin-bottom:12px;font-size:.87rem;color:#33404f}
+  .diagrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:14px}
+  .diagrid figure{margin:0;border:1px solid var(--line);border-radius:11px;padding:12px 12px 6px;background:#fff}
+  .diagrid svg{width:100%;height:auto;display:block}
+  .diagrid figcaption{font-size:.82rem;color:var(--muted);margin-top:6px;line-height:1.5}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;font-size:.84rem;color:var(--ink)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:14px;height:14px;border-radius:3px;border:1px solid #2a3340;display:inline-block}
+  .info{position:relative;border-bottom:1.6px dotted var(--accent);color:var(--accent);font-weight:600;cursor:help;outline:none}
+  .info>.pop{position:absolute;right:0;top:165%;z-index:40;width:265px;background:#0f1b2d;color:#fff;font-weight:400;font-size:.82rem;line-height:1.55;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-align:left;white-space:normal;text-transform:none;padding:11px 13px;border-radius:9px;box-shadow:0 12px 30px -8px rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:opacity .13s}
+  .info>.pop.lft{right:auto;left:0}
+  .info>.pop.up{top:auto;bottom:165%}
+  .info>.pop.keypop{width:440px;max-width:92vw}
+  .info:hover>.pop,.info:focus>.pop,.info:focus-within>.pop{opacity:1;visibility:visible}
+  .info>.pop b{color:#7fe3d8}
+  hr{border:none;border-top:1px solid var(--line);margin:34px 0}
+  .takeaway{margin-top:16px;border:1px solid #bfe0db;border-left:4px solid var(--accent);background:#f0f7f6;border-radius:10px;padding:14px 18px}
+  .takeaway .tkh{margin:0 0 8px;font-weight:700;color:#0a5c55;font-size:1.02rem}
+  .takeaway p{margin:0 0 9px;font-size:.9rem;color:#23313f;line-height:1.6}
+  .takeaway ol{margin:0 0 9px;padding-left:20px}
+  .takeaway li{font-size:.9rem;color:#23313f;line-height:1.6;margin-bottom:7px}
+  .takeaway .bl{margin:0}
+  .topnav{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:10px 14px;margin:0 0 26px;background:#0f1b2d;border-radius:11px}
+  .topnav .brand{color:#fff;font-weight:700;font-size:.9rem;margin-right:6px}
+  .topnav a{color:#aab8c9;text-decoration:none;font-size:.86rem;font-weight:600;padding:5px 11px;border-radius:7px}
+  .topnav a:hover{color:#fff;background:rgba(255,255,255,.08)}
+  .topnav a.on{color:#fff;background:var(--accent)}
+  .sitefoot{margin:40px 0 0;padding-top:16px;border-top:1px solid var(--line);text-align:center;font-size:.8rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="topnav">
+    <span class="brand">100 GHz with metal</span>
+    <a href="drude-dc.html">1 &middot; Drude parameters</a>
+    <a href="tem-line-loss.html" class="on">2 &middot; Line loss</a>
+  </nav>
+
+  <h1>Loss of a 50 &Omega; line: coax, microstrip, and CPW</h1>
+  <p class="intro">The Drude DC-anchored conductivities feed one quantity, the surface resistance
+  R<sub>s</sub> (computed on the <a href="drude-dc.html">Drude parameters page</a>), which sets the conductor loss of every line. Dielectric loss is added separately.
+  Curves are computed live, so the size slider and toggles recompute everything.</p>
+
+  <h2>Interactive loss vs frequency</h2>
+  <p class="note" style="margin-top:3px"><a href="#bridge">&darr; See the calculations behind these curves: the bridge from the Drude model and the per-line formulas</a></p>
+  <div class="panel">
+    <div class="ctrls">
+      <div class="cgrp"><span class="lab">Line</span>
+        <div class="seg" id="segLine">
+          <button data-v="coax" class="on">Coax</button>
+          <button data-v="micro">Microstrip</button>
+          <button data-v="cpw">CPW</button>
+        </div></div>
+      <div class="cgrp"><span class="lab">Show</span>
+        <div class="seg" id="segComp">
+          <button data-v="total" class="on">Total</button>
+          <button data-v="cond">Conductor</button>
+          <button data-v="diel">Dielectric</button>
+        </div></div>
+      <div class="cgrp"><span class="lab">Metals</span>
+        <div class="chk" id="chkMetals">
+          <label><input type="checkbox" value="Cu" checked> Cu</label>
+          <label><input type="checkbox" value="Ag" checked> Ag</label>
+          <label><input type="checkbox" value="Au" checked> Au</label>
+        </div></div>
+      <div class="cgrp"><span class="lab"><span class="info" tabindex="0">Size scale<span class="pop up">Scales every dimension of the selected line by this factor (0.3&times; to 3&times;) while holding it at 50 &Omega; (impedance depends on the shape ratios, not the absolute size). A bigger line spreads the current over more metal, so loss drops; a smaller line crowds it, so loss rises. It does not change the dielectric loss.</span></span> <span id="szlab" class="sizeval">1.00&times;</span></span>
+        <input type="range" id="size" min="0.3" max="3" step="0.05" value="1">
+      </div>
+    </div>
+    <div class="chartbox"><canvas id="chart"></canvas></div>
+    <p class="note" id="z0note"></p>
+    <div class="takeaway">
+      <p class="tkh">Difficulty with 100 GHz</p>
+      <ol>
+        <li>Conductor loss grows as &radic;f because the <a href="https://26kimiy.github.io/restraints-of-100ghz/#skin" target="_blank" rel="noopener">skin effect</a> packs the current into a layer only about 0.2 &micro;m thick at 100 GHz, so the metal looks steadily more resistive. By 100 GHz the loss runs from about 5.6 dB/m for a large coax up to roughly 200 dB/m for a chip-scale CPW (see the snapshot below).</li>
+        <li><b>The three metals sit almost on top of each other.</b> Going Cu &rarr; Ag &rarr; Au changes the loss by at most about 20% (silver a hair better than copper, gold about 20% worse). Silver is the best conductor that exists and it barely helps, so you cannot escape by picking a better metal; the metal itself is the wall.</li>
+        <li><b>The line type spreads far more than the metal.</b> A large coax stays near 5 dB/m while a chip-scale CPW is near 200 dB/m, about 35&times; worse, purely because its tiny conductors crowd the current into less metal. At 100 GHz you are pushed onto exactly those small on-chip lines, so you are stuck high on the graph.</li>
+      </ol>
+      <p class="bl"><b>Bottom line:</b> on the small planar lines you are forced to use at 100 GHz, the loss is set by the metal's skin effect, and conductor loss far outweighs the dielectric loss. There is no better metal to switch to, so the metal interconnect, not the insulator, is the bottleneck.</p>
+    </div>
+  </div>
+
+  <h2>Snapshot at 100 GHz <span class="sub">(standard 50 &Omega; designs, total loss, dB/m)</span></h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Line</th><th class="nc">Cu<span class="u">dB/m</span></th><th class="nc">Ag<span class="u">dB/m</span></th><th class="nc">Au<span class="u">dB/m</span></th><th>Conductor / dielectric (Cu)<span class="u">dB/m</span></th></tr></thead>
+    <tbody>
+      <tr><td class="metal">Coax</td><td class="num">5.59</td><td class="num">5.52</td><td class="num">6.19</td><td class="num">2.95 / 2.64</td></tr>
+      <tr><td class="metal">Microstrip</td><td class="num">60.6</td><td class="num">59.2</td><td class="num">72.6</td><td class="num">58.3 / 2.21</td></tr>
+      <tr><td class="metal">CPW</td><td class="num">198.3</td><td class="num">193.7</td><td class="num">238.7</td><td class="num">196.3 / 1.93</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">These match the verified Python module (loss_models.py). Coax is lowest because its conductors are largest; CPW is highest because its 50 &micro;m strip and 22 &micro;m gaps crowd the current. Conductor loss grows as &radic;f and dielectric loss as f, so the dielectric term catches up at high frequency.</p>
+
+  <h2>What the three lines look like <span class="sub">- cross-sections, not to scale</span></h2>
+  <div class="legend">
+    <span><i style="background:#c08038"></i> signal conductor</span>
+    <span><i style="background:#7c8a99"></i> ground conductor</span>
+    <span><i style="background:#d7e6f4"></i> dielectric (insulator)</span>
+  </div>
+  <div class="diagrid">
+    <figure>
+      <svg viewBox="0 0 300 190" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="95" cy="95" r="78" fill="#7c8a99" stroke="#2a3340"/>
+        <circle cx="95" cy="95" r="60" fill="#d7e6f4" stroke="#2a3340" stroke-width="0.6"/>
+        <circle cx="95" cy="95" r="13" fill="#c08038" stroke="#2a3340"/>
+        <line x1="95" y1="95" x2="95" y2="17" stroke="#5b6b7d" stroke-width="0.7" stroke-dasharray="2 2"/>
+        <text x="99" y="86" font-size="10" fill="#16202e">a</text>
+        <text x="99" y="42" font-size="10" fill="#16202e">b</text>
+        <line x1="150" y1="48" x2="186" y2="42" stroke="#5b6b7d" stroke-width="0.8"/>
+        <text x="189" y="45" font-size="11" fill="#16202e">outer (ground)</text>
+        <line x1="140" y1="95" x2="186" y2="92" stroke="#5b6b7d" stroke-width="0.8"/>
+        <text x="189" y="95" font-size="11" fill="#16202e">dielectric</text>
+        <line x1="95" y1="95" x2="186" y2="142" stroke="#5b6b7d" stroke-width="0.8"/>
+        <text x="189" y="145" font-size="11" fill="#16202e">center (signal)</text>
+      </svg>
+      <figcaption>Coax: a center wire (signal) inside an outer tube (ground), dielectric filling the gap. a and b are the inner and outer radii.</figcaption>
+    </figure>
+    <figure>
+      <svg viewBox="0 0 300 175" xmlns="http://www.w3.org/2000/svg">
+        <rect x="25" y="120" width="180" height="14" fill="#7c8a99" stroke="#2a3340"/>
+        <rect x="25" y="64" width="180" height="56" fill="#d7e6f4" stroke="#2a3340" stroke-width="0.6"/>
+        <rect x="95" y="52" width="40" height="12" fill="#c08038" stroke="#2a3340"/>
+        <line x1="95" y1="46" x2="135" y2="46" stroke="#5b6b7d" stroke-width="0.8"/>
+        <text x="115" y="42" font-size="10" fill="#16202e" text-anchor="middle">W</text>
+        <line x1="18" y1="64" x2="18" y2="120" stroke="#5b6b7d" stroke-width="0.8"/>
+        <text x="12" y="96" font-size="10" fill="#16202e" text-anchor="middle">h</text>
+        <line x1="135" y1="56" x2="214" y2="50" stroke="#5b6b7d" stroke-width="0.8"/>
+        <text x="217" y="53" font-size="11" fill="#16202e">signal strip</text>
+        <line x1="205" y1="92" x2="214" y2="92" stroke="#5b6b7d" stroke-width="0.8"/>
+        <text x="217" y="95" font-size="11" fill="#16202e">substrate</text>
+        <line x1="205" y1="127" x2="214" y2="138" stroke="#5b6b7d" stroke-width="0.8"/>
+        <text x="217" y="141" font-size="11" fill="#16202e">ground plane</text>
+      </svg>
+      <figcaption>Microstrip: a strip (signal) of width W on a dielectric substrate of height h, with a ground plane underneath.</figcaption>
+    </figure>
+    <figure>
+      <svg viewBox="0 0 300 175" xmlns="http://www.w3.org/2000/svg">
+        <rect x="30" y="80" width="230" height="60" fill="#d7e6f4" stroke="#2a3340" stroke-width="0.6"/>
+        <rect x="30" y="66" width="78" height="14" fill="#7c8a99" stroke="#2a3340"/>
+        <rect x="133" y="66" width="40" height="14" fill="#c08038" stroke="#2a3340"/>
+        <rect x="198" y="66" width="62" height="14" fill="#7c8a99" stroke="#2a3340"/>
+        <text x="153" y="59" font-size="10" fill="#16202e" text-anchor="middle">signal (S)</text>
+        <text x="69" y="59" font-size="10" fill="#16202e" text-anchor="middle">ground</text>
+        <text x="229" y="59" font-size="10" fill="#16202e" text-anchor="middle">ground</text>
+        <text x="120" y="76" font-size="9" fill="#16202e" text-anchor="middle">g</text>
+        <text x="186" y="76" font-size="9" fill="#16202e" text-anchor="middle">g</text>
+        <text x="145" y="113" font-size="11" fill="#16202e" text-anchor="middle">substrate (dielectric)</text>
+      </svg>
+      <figcaption>CPW: a center strip (signal) of width S with ground metal on both sides, separated by gaps g, all on one surface over a substrate.</figcaption>
+    </figure>
+  </div>
+
+  <h2 id="bridge">The bridge from the Drude model</h2>
+  <p class="note">The fast current crowds into a thin surface skin, so the metal presents a surface resistance R<sub>s</sub>, the real part of its surface impedance <a href="#r1">[1]</a>. We feed it the full Drude conductivity &sigma;(&omega;) = &sigma;<sub>dc</sub>/(1 &minus; i&omega;&tau;) from the parameters page <a href="#r3">[3]</a>, so the curves stay exact across the whole band:</p>
+  <p class="eq" style="margin:12px 0 0;font-size:1.1rem">
+    R<sub>s</sub> = Re <span class="rad-sign">&radic;</span><span class="frac"><span class="n">i&omega;&mu;<sub>0</sub></span><span class="d">&sigma;(&omega;)</span></span>
+  </p>
+  <p class="note">At low frequency &sigma;(&omega;) &rarr; &sigma;<sub>dc</sub> and this reduces to the familiar R<sub>s</sub> = &radic;(&pi; f &mu;<sub>0</sub> / &sigma;<sub>dc</sub>) &prop; &radic;f; at 100 GHz the two agree to about 1%, and the gap grows to roughly 8% by 1 THz (up to about 13% for silver). Conductor loss for each line is R<sub>s</sub> times a geometry factor; dielectric loss comes from the substrate tan&delta; (not from the metal).</p>
+
+  <h2>Per-line formulas <span class="sub">(&alpha; in Np/m; &times;8.686 gives dB/m)</span></h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Line</th><th>Conductor loss &alpha;<sub>c</sub></th><th>Dielectric loss &alpha;<sub>d</sub></th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td class="metal">Coax</td>
+        <td class="eq">&alpha;<sub>c</sub> = <span class="frac"><span class="n">R<sub>s</sub> (1/a + 1/b)</span><span class="d">2 &eta; ln(b/a)</span></span></td>
+        <td class="eq">&alpha;<sub>d</sub> = <span class="frac"><span class="n">&pi; f &radic;&epsilon;<sub>r</sub></span><span class="d">c</span></span> tan&delta;</td>
+        <td><a href="#r1">[1]</a></td></tr>
+      <tr><td class="metal">Microstrip</td>
+        <td class="eq">&alpha;<sub>c</sub> &approx; <span class="frac"><span class="n">R<sub>s</sub></span><span class="d">Z<sub>0</sub> W</span></span></td>
+        <td class="eq">&alpha;<sub>d</sub> = <span class="frac"><span class="n">k<sub>0</sub> &epsilon;<sub>r</sub>(&epsilon;<sub>eff</sub>&minus;1)</span><span class="d">2&radic;&epsilon;<sub>eff</sub>(&epsilon;<sub>r</sub>&minus;1)</span></span> tan&delta;</td>
+        <td><a href="#r1">[1]</a><a href="#r2">[2]</a></td></tr>
+      <tr><td class="metal">CPW</td>
+        <td class="eq">&alpha;<sub>c</sub> = R<sub>s</sub> &middot; <span class="info" tabindex="0">G<sub>cpw</sub><span class="pop up lft keypop"><b>G<sub>cpw</sub> = geometry factor (Ghione-Naldi):</b> &radic;&epsilon;<sub>eff</sub> / [480&pi; K(k) K&prime;(k) (1&minus;k<sup>2</sup>)] &times; { (1/a)[&pi; + ln(8&pi;a(1&minus;k)/(t(1+k)))] + (1/b)[&pi; + ln(8&pi;b(1&minus;k)/(t(1+k)))] }, with a = S/2, b = S/2+g, k = S/(S+2g), t = metal thickness. It is the conformal-mapping bookkeeping that describes how the current crowds at the strip and gap edges. The whole CPW loss is just R<sub>s</sub> times this, the same pattern as coax and microstrip.</span></span></td>
+        <td class="eq">same form as microstrip</td>
+        <td><a href="#r2">[2]</a></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">&eta; = &eta;<sub>0</sub>/&radic;&epsilon;<sub>r</sub>; Z<sub>0</sub> and &epsilon;<sub>eff</sub> from Hammerstad-Jensen (microstrip) and conformal mapping (CPW). Each line is solved to 50 &Omega;. The substrate dielectric constants and loss tangents are typical published values <a href="#r4">[4]</a>.</p>
+  <p class="note"><span class="info" tabindex="0" style="font-weight:700">Symbol key<span class="pop lft keypop"><b>&alpha;<sub>c</sub>, &alpha;<sub>d</sub></b>: loss per meter from the conductor and from the dielectric (&times;8.686 turns Np/m into dB/m).<br>
+    <b>R<sub>s</sub></b>: surface resistance, how lossy the metal surface looks to the fast current; bigger means more loss.<br>
+    <b>&delta;</b>: skin depth, the thin surface layer the current crowds into.<br>
+    <b>&sigma;</b>: the metal's conductivity (how well it conducts). &nbsp;<b>&rho;</b>: resistivity = 1/&sigma;.<br>
+    <b>f</b>: frequency. &nbsp;<b>&omega;</b>: angular frequency = 2&pi;f. &nbsp;<b>k<sub>0</sub></b>: free-space wavenumber = 2&pi;f/c.<br>
+    <b>&mu;<sub>0</sub></b>: permeability of free space (a fixed constant). &nbsp;<b>c</b>: speed of light.<br>
+    <b>a, b</b> (coax): inner-wire radius and outer-tube inner radius.<br>
+    <b>&eta;</b>: wave impedance of the insulator = &eta;<sub>0</sub>/&radic;&epsilon;<sub>r</sub>. &nbsp;<b>&eta;<sub>0</sub></b> &approx; 377 &Omega; (free space).<br>
+    <b>&epsilon;<sub>r</sub></b>: dielectric constant of the insulator (PTFE &approx; 2.1, alumina &approx; 9.9). &nbsp;<b>&epsilon;<sub>eff</sub></b>: effective value when the field is split between substrate and air.<br>
+    <b>tan&delta;</b>: loss tangent, the insulator's leakiness (small = good).<br>
+    <b>Z<sub>0</sub></b>: characteristic impedance (50 &Omega; here). &nbsp;<b>W</b>: strip width. &nbsp;<b>ln(b/a)</b>: natural log of the size ratio.<br>
+    <b>CPW</b>: S center-strip width, g gap, k = S/(S+2g), a = S/2, b = S/2+g, t metal thickness; <b>K(k)</b> a special function (elliptic integral) from the conformal mapping.</span></span></p>
+
+  <hr>
+  <h2>References</h2>
+  <ol class="refs">
+    <li id="r1"><b>[1]</b> D. M. Pozar, <i>Microwave Engineering</i>, Wiley. Skin depth, surface resistance, coaxial-line
+      conductor and dielectric attenuation, and the microstrip dielectric-loss formula.</li>
+    <li id="r2"><b>[2]</b> Qucs technical reference (after K. C. Gupta et al. and G. Ghione / C. Naldi):
+      microstrip Hammerstad-Jensen Z<sub>0</sub> and &epsilon;<sub>eff</sub>, and CPW conformal-mapping impedance
+      plus conductor-loss formula.
+      <a href="https://qucs.sourceforge.net/tech/node86.html">qucs.sourceforge.net/tech/node86.html</a></li>
+    <li id="r3"><b>[3]</b> Conductivities &sigma;<sub>dc</sub> from the DC-anchored Drude model (Cu 5.96, Ag 6.30,
+      Au 4.10 &times;10<sup>7</sup> S/m), traced to CRC Handbook resistivities (see the Drude parameters page).</li>
+    <li id="r4"><b>[4]</b> Dielectric properties (typical): PTFE &epsilon;<sub>r</sub> = 2.1, tan&delta; = 2&times;10<sup>&minus;4</sup>;
+      alumina (99.5%) &epsilon;<sub>r</sub> = 9.9, tan&delta; = 1&times;10<sup>&minus;4</sup>. Manufacturer / handbook values.</li>
+  </ol>
+  <p class="sitefoot">Built by Kimi Yashar, made using Claude.</p>
+
+</div>
+
+<script>
+(function(){
+  const MU0=1.25663706212e-6, EPS0=8.8541878128e-12, C=2.99792458e8, ETA0=Math.sqrt(MU0/EPS0), NP2DB=8.685889638;
+  const SIGMA={Cu:5.9595e7, Ag:6.3012e7, Au:4.0984e7};
+  const TAU={Cu:2.491e-14, Ag:3.818e-14, Au:2.465e-14};
+  const COL={Cu:'#b4531f', Ag:'#5b6b7d', Au:'#b8902a'};
+  // R_s = Re( sqrt(i w mu0 / sigma(w)) ) with sigma(w)=sigma_dc/(1 - i w tau).
+  // i w mu0 / sigma(w) = (w mu0 / sigma_dc) * (w*tau + i); R_s is Re of its sqrt.
+  const Rs=(f,m)=>{const w=2*Math.PI*f, p=w*MU0/SIGMA[m], wt=w*TAU[m];
+    const re=p*wt, im=p, mag=Math.hypot(re,im), ang=Math.atan2(im,re);
+    return Math.sqrt(mag)*Math.cos(ang/2);};
+  function agm(a,b){for(let i=0;i<60;i++){const na=(a+b)/2,nb=Math.sqrt(a*b);a=na;b=nb;if(Math.abs(a-b)<1e-16*a)break;}return a;}
+  const K=(k)=>Math.PI/(2*agm(1,Math.sqrt(1-k*k)));
+  const Kp=(k)=>K(Math.sqrt(1-k*k));
+
+  function coax(sc){const a=0.5e-3*sc,b=1.673e-3*sc,er=2.1,td=2e-4,eta=ETA0/Math.sqrt(er);
+    const Z0=eta/(2*Math.PI)*Math.log(b/a);
+    return {Z0, ac:(f,m)=>Rs(f,m)*(1/a+1/b)/(2*eta*Math.log(b/a)), ad:(f)=>Math.PI*f*Math.sqrt(er)/C*td};}
+  function micro(sc){const h=254e-6*sc,W=244.2e-6*sc,er=9.9,td=1e-4,u=W/h;
+    const a_u=1+Math.log((Math.pow(u,4)+Math.pow(u/52,2))/(Math.pow(u,4)+0.432))/49+Math.log(1+Math.pow(u/18.1,3))/18.7;
+    const b_er=0.564*Math.pow((er-0.9)/(er+3),0.053);
+    const ee=(er+1)/2+(er-1)/2*Math.pow(1+10/u,-a_u*b_er);
+    const f_u=6+(2*Math.PI-6)*Math.exp(-Math.pow(30.666/u,0.7528));
+    const Z0=ETA0/(2*Math.PI*Math.sqrt(ee))*Math.log(f_u/u+Math.sqrt(1+Math.pow(2/u,2)));
+    return {Z0, ac:(f,m)=>Rs(f,m)/(Z0*W), ad:(f)=>{const k0=2*Math.PI*f/C;return k0*er*(ee-1)/(2*Math.sqrt(ee)*(er-1))*td;}};}
+  function cpw(sc){const W=50e-6*sc,s=22.34e-6*sc,er=9.9,td=1e-4,t=3e-6,k1=W/(W+2*s),ee=(er+1)/2;
+    const Z0=30*Math.PI/Math.sqrt(ee)*Kp(k1)/K(k1),a=W/2,b=W/2+s,Kk=K(k1),Kpk=Kp(k1);
+    return {Z0, ac:(f,m)=>{const rs=Rs(f,m),pref=rs*Math.sqrt(ee)/(480*Math.PI*Kk*Kpk*(1-k1*k1));
+      const ta=(1/a)*(Math.PI+Math.log(8*Math.PI*a*(1-k1)/(t*(1+k1))));
+      const tb=(1/b)*(Math.PI+Math.log(8*Math.PI*b*(1-k1)/(t*(1+k1))));return pref*(ta+tb);},
+      ad:(f)=>{const k0=2*Math.PI*f/C;return k0*er*(ee-1)/(2*Math.sqrt(ee)*(er-1))*td;}};}
+  const LINES={coax, micro, cpw};
+
+  const freqs=[]; for(let i=0;i<=90;i++){freqs.push(1e9*Math.pow(1000,i/90));} // 1 GHz -> 1 THz
+
+  const state={line:'coax', comp:'total', metals:{Cu:true,Ag:true,Au:true}, size:1};
+
+  // vertical line at 100 GHz
+  const marker={id:'mark100',afterDraw(c){const x=c.scales.x.getPixelForValue(1e11);if(x<c.chartArea.left||x>c.chartArea.right)return;
+    const ctx=c.ctx;ctx.save();ctx.strokeStyle='#c0392b';ctx.setLineDash([5,4]);ctx.lineWidth=1.3;
+    ctx.beginPath();ctx.moveTo(x,c.chartArea.top);ctx.lineTo(x,c.chartArea.bottom);ctx.stroke();
+    ctx.fillStyle='#c0392b';ctx.font='600 11px sans-serif';ctx.fillText('100 GHz',x+4,c.chartArea.top+12);ctx.restore();}};
+
+  function fmtFreq(f){ if(f>=1e12) return (f/1e12).toPrecision(3)+' THz'; if(f>=1e9) return (f/1e9).toPrecision(3)+' GHz'; if(f>=1e6) return (f/1e6).toPrecision(3)+' MHz'; return f.toPrecision(3)+' Hz'; }
+  function fmtTick(v){ const l=Math.log10(v); if(Math.abs(l-Math.round(l))>1e-6) return ''; if(v>=1e12) return (v/1e12)+' THz'; if(v>=1e9) return (v/1e9)+' GHz'; if(v>=1e6) return (v/1e6)+' MHz'; return v+' Hz'; }
+  const ctx=document.getElementById('chart');
+  const chart=new Chart(ctx,{type:'line',data:{datasets:[]},options:{
+    responsive:true,maintainAspectRatio:false,animation:false,
+    parsing:false,
+    scales:{
+      x:{type:'logarithmic',title:{display:true,text:'Frequency'},min:1e9,max:1e12,ticks:{callback:fmtTick,autoSkip:false,maxRotation:0}},
+      y:{type:'logarithmic',title:{display:true,text:'Attenuation (dB/m)'}}
+    },
+    plugins:{legend:{labels:{usePointStyle:true,boxWidth:8}},
+      tooltip:{callbacks:{title:(it)=>fmtFreq(it[0].parsed.x),
+        label:(it)=>it.dataset.label+': '+it.parsed.y.toFixed(2)+' dB/m'}}}
+  },plugins:[marker]});
+
+  function build(){
+    const L=LINES[state.line](state.size);
+    document.getElementById('z0note').innerHTML=`Z₀ = ${L.Z0.toFixed(1)} Ω at this size. Dielectric loss is identical for all metals (no σ dependence).`;
+    const ds=[];
+    const comps = state.comp==='total'?['cond','diel']:[state.comp];
+    ['Cu','Ag','Au'].forEach(m=>{
+      if(!state.metals[m]) return;
+      if(state.comp==='diel'){
+        // dielectric same for all metals; draw once (under Cu) to avoid overlap clutter
+        const fc=['Cu','Ag','Au'].find(x=>state.metals[x]); if(m!==fc) return;
+      }
+      const pts=freqs.map(f=>{
+        let v=0;
+        if(state.comp==='total') v=(L.ac(f,m)+L.ad(f))*NP2DB;
+        else if(state.comp==='cond') v=L.ac(f,m)*NP2DB;
+        else v=L.ad(f)*NP2DB;
+        return {x:f,y:v};
+      });
+      ds.push({label: state.comp==='diel'?'Dielectric':(m+(state.comp==='cond'?' conductor':' total')),
+        data:pts, borderColor: state.comp==='diel'?'#2a7':COL[m], backgroundColor:COL[m],
+        borderWidth:2, pointRadius:0, tension:0.05});
+    });
+    chart.data.datasets=ds;
+    chart.update();
+  }
+
+  document.getElementById('segLine').addEventListener('click',e=>{if(e.target.dataset.v){
+    state.line=e.target.dataset.v; setOn('segLine',e.target); build();}});
+  document.getElementById('segComp').addEventListener('click',e=>{if(e.target.dataset.v){
+    state.comp=e.target.dataset.v; setOn('segComp',e.target); build();}});
+  document.getElementById('chkMetals').addEventListener('change',e=>{
+    state.metals[e.target.value]=e.target.checked; build();});
+  document.getElementById('size').addEventListener('input',e=>{
+    state.size=parseFloat(e.target.value);
+    document.getElementById('szlab').textContent=state.size.toFixed(2)+'×'; build();});
+  function setOn(id,btn){document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',b===btn));}
+
+  build();
+})();
+</script>
+</body>
+</html>

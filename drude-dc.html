@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drude parameters (DC-anchored) for Cu, Ag, Au</title>
+<style>
+  :root{--ink:#16202e;--muted:#56657a;--line:#e3e8ef;--line2:#cdd5e0;--head:#eef2f7;--zebra:#f7fafc;--accent:#0d7d74;--num:#0f1b2d;}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;padding:42px 22px 90px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);line-height:1.55;background:#fff;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1100px;margin:0 auto}
+  h1{font-size:1.75rem;margin:0 0 6px;letter-spacing:-.01em}
+  h2{font-size:1.22rem;margin:40px 0 4px}
+  h2 .sub{font-weight:400;color:var(--muted);font-size:.9rem}
+  p.intro{color:var(--muted);max-width:860px;margin:6px 0 0}
+  p.note{color:var(--muted);font-size:.87rem;max-width:900px;margin:9px 0 0}
+  .constwrap{margin:22px 0 0}
+  .constlabel{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#42526a;margin:0 0 8px}
+  .consttable{border-collapse:collapse;width:100%;min-width:560px;font-size:.9rem}
+  .consttable th{background:#eaf5f3;color:#0a5c55;border:1px solid #cfe3df;padding:10px 14px;text-align:center;font-size:.78rem;font-weight:700;line-height:1.4;text-transform:none}
+  .consttable th .sym{display:block;margin-top:3px;color:#0d7d74;font-size:1.15rem;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;text-transform:none}
+  .consttable td{border:1px solid var(--line);padding:12px 14px;text-align:center;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--num);background:#fff;font-size:.95rem}
+  .scroll{overflow-x:auto;margin-top:13px;border:1px solid var(--line);border-radius:11px}
+  table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:640px}
+  th,td{padding:10px 14px;text-align:left;vertical-align:middle;border-bottom:1px solid var(--line)}
+  thead th{background:var(--head);border-bottom:2px solid var(--line2);font-size:.79rem;text-transform:uppercase;letter-spacing:.03em;color:#42526a;white-space:nowrap}
+  thead th.nc{text-transform:none}
+  tbody tr:nth-child(even){background:var(--zebra)}
+  tbody tr:hover{background:#edf6f5}
+  td.num{font-variant-numeric:tabular-nums;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;text-align:left;white-space:nowrap;color:var(--num)}
+  td.eq{font-size:1rem;line-height:1.4}
+  .metal{font-weight:700}
+  a.cite{color:var(--accent);font-weight:600;text-decoration:none;white-space:nowrap}
+  a.cite:hover{text-decoration:underline}
+  sub,sup{font-size:.72em}
+  .frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .2em}
+  .frac>.n{padding:0 .5em 1px;border-bottom:1.6px solid currentColor}
+  .frac>.d{padding:1px .5em 0}
+  .rad-sign{font-size:1.85em;line-height:1;vertical-align:-.18em;margin:0 .1em 0 .04em;font-weight:300}
+  .calc{color:var(--muted);font-style:italic;font-size:.82em}
+  .info{position:relative;border-bottom:1.6px dotted var(--accent);color:var(--accent);font-weight:600;cursor:help;outline:none}
+  .info>.pop{position:absolute;right:0;top:165%;z-index:40;width:265px;background:#0f1b2d;color:#fff;font-weight:400;font-size:.82rem;line-height:1.55;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-align:left;white-space:normal;padding:11px 13px;border-radius:9px;box-shadow:0 12px 30px -8px rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:opacity .13s}
+  .info>.pop.lft{right:auto;left:0}
+  .info>.pop.up{top:auto;bottom:165%}
+  .info:hover>.pop,.info:focus>.pop,.info:focus-within>.pop{opacity:1;visibility:visible}
+  .info>.pop b{color:#7fe3d8}
+  .refs{margin-top:14px;padding-left:0;list-style:none}
+  .refs li{margin-bottom:13px;font-size:.88rem;color:#33404f;padding:6px 8px;border-radius:7px}
+  .refs li:target{background:#fff5e0}
+  .refs a{color:var(--accent);word-break:break-word}
+  .refs .lbl{font-weight:700;color:var(--ink);margin-right:4px}
+  hr{border:none;border-top:1px solid var(--line);margin:36px 0}
+  .topnav{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:10px 14px;margin:0 0 26px;background:#0f1b2d;border-radius:11px}
+  .topnav .brand{color:#fff;font-weight:700;font-size:.9rem;margin-right:6px}
+  .topnav a{color:#aab8c9;text-decoration:none;font-size:.86rem;font-weight:600;padding:5px 11px;border-radius:7px}
+  .topnav a:hover{color:#fff;background:rgba(255,255,255,.08)}
+  .topnav a.on{color:#fff;background:var(--accent)}
+  .sitefoot{margin:40px 0 0;padding-top:16px;border-top:1px solid var(--line);text-align:center;font-size:.8rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="topnav">
+    <span class="brand">100 GHz with metal</span>
+    <a href="drude-dc.html" class="on">1 &middot; Drude parameters</a>
+    <a href="tem-line-loss.html">2 &middot; Line loss</a>
+  </nav>
+
+  <h1>Drude parameters for copper, silver, and gold</h1>
+  <p class="intro">We opted for the DC-anchored route only because at 100 GHz the metal is a pure free-electron conductor, far below the optical and interband region, so every parameter follows from measured DC quantities (&rho;, density, molar mass) with no fitting. Optical fitting will be implemented in version 2. Every input number (&rho;, &rho;<sub>m</sub>, M) comes from one source, the CRC Handbook <a class="cite" href="#ref1">[1]</a>; the equations are the standard Drude model <a class="cite" href="#ref2">[2]</a>. Everything below is calculated; nothing is fitted.</p>
+
+  <div class="constwrap">
+    <p class="constlabel">Physical constants (<a href="https://physics.nist.gov/cuu/Constants/" style="color:var(--accent)">CODATA 2018</a>)</p>
+    <div class="scroll">
+    <table class="consttable">
+      <thead><tr>
+        <th>Elementary charge<span class="sym">e</span></th>
+        <th>Electron mass<span class="sym">m<sub>e</sub></span></th>
+        <th>Vacuum permittivity<span class="sym">&epsilon;<sub>0</sub></span></th>
+        <th>Avogadro constant<span class="sym">N<sub>A</sub></span></th>
+        <th>Permeability of free space<span class="sym">&mu;<sub>0</sub></span></th>
+      </tr></thead>
+      <tbody><tr>
+        <td>1.602176634&times;10<sup>&minus;19</sup> C</td>
+        <td>9.1093837&times;10<sup>&minus;31</sup> kg</td>
+        <td>8.8541878&times;10<sup>&minus;12</sup> F/m</td>
+        <td>6.02214076&times;10<sup>23</sup> mol<sup>&minus;1</sup></td>
+        <td>1.25663706&times;10<sup>&minus;6</sup> H/m</td>
+      </tr></tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- ===================== TABLE 1 ===================== -->
+  <h2>Table 1. Per-metal inputs from the CRC Handbook <a class="cite" href="#ref1">[1]</a></h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Parameter</th><th>Symbol</th><th class="nc">Cu</th><th class="nc">Ag</th><th class="nc">Au</th><th>How measured</th></tr></thead>
+    <tbody>
+      <tr><td>Resistivity</td><td class="num">&rho; (&Omega;&middot;m)</td>
+        <td class="num">1.678&times;10<sup>&minus;8</sup></td><td class="num">1.587&times;10<sup>&minus;8</sup></td><td class="num">2.44&times;10<sup>&minus;8</sup></td>
+        <td><span class="info" tabindex="0">four-point probe<span class="pop"><b>Four-point probe:</b> a known current is driven through two outer contacts while the voltage is read across two inner contacts. Using separate contacts for current and voltage cancels contact resistance, giving the true resistivity &rho;.</span></span></td></tr>
+      <tr><td>Mass density</td><td class="num">&rho;<sub>m</sub> (kg/m<sup>3</sup>)</td>
+        <td class="num">8960</td><td class="num">10490</td><td class="num">19300</td>
+        <td><span class="info" tabindex="0">X-ray + weighing<span class="pop"><b>X-ray crystallography + weighing:</b> X-ray diffraction gives the lattice spacing and how the atoms pack; weighing a known volume gives the mass per volume. Together they pin down the density &rho;<sub>m</sub>.</span></span></td></tr>
+      <tr><td>Molar mass</td><td class="num">M (g/mol)</td>
+        <td class="num">63.546</td><td class="num">107.868</td><td class="num">196.967</td>
+        <td><span class="info" tabindex="0">standard atomic weight<span class="pop up"><b>Atomic weight M:</b> the mass of one mole of atoms, fixed by the isotope masses and their natural abundances measured with a mass spectrometer.</span></span></td></tr>
+      <tr><td>Electrons per atom</td><td class="num">Z</td>
+        <td class="num">1</td><td class="num">1</td><td class="num">1</td>
+        <td><span class="info" tabindex="0">valence (monovalent)<span class="pop up"><b>Z = 1:</b> Cu, Ag, and Au are monovalent noble metals, each with one valence s-electron outside a filled d-shell (Cu [Ar]3d<sup>10</sup>4s<sup>1</sup>, Ag [Kr]4d<sup>10</sup>5s<sup>1</sup>, Au [Xe]4f<sup>14</sup>5d<sup>10</sup>6s<sup>1</sup>). Only that s-electron joins the conduction gas.</span></span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- ===================== TABLE 2 ===================== -->
+  <h2>Table 2. Calculated values</h2>
+  <p class="note">Every relation is the standard Drude free-electron model <a class="cite" href="#ref2">[2]</a>. The universal constants e, m<sub>e</sub>, &epsilon;<sub>0</sub>, N<sub>A</sub> are from the constants table above.</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Parameter</th><th>Symbol</th><th>Equation</th><th class="nc">Cu</th><th class="nc">Ag</th><th class="nc">Au</th><th>Inputs used</th></tr></thead>
+    <tbody>
+      <tr><td>Carrier density</td><td class="num">n (m<sup>&minus;3</sup>)</td>
+        <td class="eq">n = <span class="frac"><span class="n">Z&nbsp;&rho;<sub>m</sub>&nbsp;N<sub>A</sub></span><span class="d">M</span></span></td>
+        <td class="num">8.49&times;10<sup>28</sup></td><td class="num">5.86&times;10<sup>28</sup></td><td class="num">5.90&times;10<sup>28</sup></td>
+        <td class="num">&rho;<sub>m</sub>, M, Z</td></tr>
+      <tr><td>DC conductivity</td><td class="num">&sigma;<sub>dc</sub> (S/m)</td>
+        <td class="eq">&sigma;<sub>dc</sub> = <span class="frac"><span class="n">1</span><span class="d">&rho;</span></span></td>
+        <td class="num">5.96&times;10<sup>7</sup></td><td class="num">6.30&times;10<sup>7</sup></td><td class="num">4.10&times;10<sup>7</sup></td>
+        <td class="num">&rho;</td></tr>
+      <tr><td>Plasma frequency</td><td class="num">&omega;<sub>p</sub> (rad/s)</td>
+        <td class="eq">&omega;<sub>p</sub> = <span class="rad-sign">&radic;</span><span class="frac"><span class="n">n&nbsp;e<sup>2</sup></span><span class="d">&epsilon;<sub>0</sub>&nbsp;m<sub>e</sub></span></span></td>
+        <td class="num">1.6439&times;10<sup>16</sup><br><span class="calc">10.82 eV</span></td>
+        <td class="num">1.3652&times;10<sup>16</sup><br><span class="calc">8.99 eV</span></td>
+        <td class="num">1.3704&times;10<sup>16</sup><br><span class="calc">9.02 eV</span></td>
+        <td class="num">n</td></tr>
+      <tr><td>Relaxation time</td><td class="num">&tau; (s)</td>
+        <td class="eq">&tau; = <span class="frac"><span class="n">m<sub>e</sub>&nbsp;&sigma;<sub>dc</sub></span><span class="d">n&nbsp;e<sup>2</sup></span></span></td>
+        <td class="num">2.491&times;10<sup>&minus;14</sup><br><span class="calc">24.91 fs</span></td>
+        <td class="num">3.818&times;10<sup>&minus;14</sup><br><span class="calc">38.18 fs</span></td>
+        <td class="num">2.465&times;10<sup>&minus;14</sup><br><span class="calc">24.65 fs</span></td>
+        <td class="num">&sigma;<sub>dc</sub>, n</td></tr>
+      <tr><td>Damping frequency</td><td class="num">&gamma; (rad/s)</td>
+        <td class="eq">&gamma; = <span class="frac"><span class="n">1</span><span class="d">&tau;</span></span></td>
+        <td class="num">4.015&times;10<sup>13</sup><br><span class="calc">26.43 meV</span></td>
+        <td class="num">2.619&times;10<sup>13</sup><br><span class="calc">17.24 meV</span></td>
+        <td class="num">4.057&times;10<sup>13</sup><br><span class="calc">26.71 meV</span></td>
+        <td class="num">&tau;</td></tr>
+      <tr><td>Background permittivity</td><td class="num">&epsilon;<sub>&infin;</sub></td>
+        <td class="eq">&epsilon;<sub>&infin;</sub> = 1 &nbsp;<span class="info" tabindex="0">(assumed)<span class="pop up"><b>Why &epsilon;<sub>&infin;</sub> = 1:</b> &epsilon;<sub>&infin;</sub> is the response of the bound core and d-band electrons, which only matters at optical and UV frequencies. The pure free-electron model leaves them out, so we set &epsilon;<sub>&infin;</sub> = 1. At microwave frequencies it makes no measurable difference, because the free-electron conduction term dominates completely.</span></span></td>
+        <td class="num">1</td><td class="num">1</td><td class="num">1</td>
+        <td class="num">assumed</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- ===================== TABLE 3 ===================== -->
+  <h2>Table 3. Frequency-dependent functions <span class="sub">- each metal's parameters substituted in; &omega; stays the variable</span></h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Quantity</th><th>Symbol</th><th>Equation</th><th class="nc">Cu</th><th class="nc">Ag</th><th class="nc">Au</th></tr></thead>
+    <tbody>
+      <tr><td>AC conductivity</td><td class="num">&sigma;(&omega;)</td>
+        <td class="eq">&sigma;(&omega;) = <span class="frac"><span class="n">&sigma;<sub>dc</sub></span><span class="d">1 &minus; i&omega;&tau;</span></span></td>
+        <td class="eq"><span class="frac"><span class="n">5.96&times;10<sup>7</sup></span><span class="d">1 &minus; i&omega;(2.49&times;10<sup>&minus;14</sup>)</span></span></td>
+        <td class="eq"><span class="frac"><span class="n">6.30&times;10<sup>7</sup></span><span class="d">1 &minus; i&omega;(3.82&times;10<sup>&minus;14</sup>)</span></span></td>
+        <td class="eq"><span class="frac"><span class="n">4.10&times;10<sup>7</sup></span><span class="d">1 &minus; i&omega;(2.47&times;10<sup>&minus;14</sup>)</span></span></td></tr>
+      <tr><td>Dielectric function</td><td class="num">&epsilon;(&omega;)</td>
+        <td class="eq">&epsilon;(&omega;) = 1 &minus; <span class="frac"><span class="n">&omega;<sub>p</sub><sup>2</sup></span><span class="d">&omega;<sup>2</sup> + i&gamma;&omega;</span></span></td>
+        <td class="eq">1 &minus; <span class="frac"><span class="n">2.70&times;10<sup>32</sup></span><span class="d">&omega;<sup>2</sup> + i&omega;(4.015&times;10<sup>13</sup>)</span></span></td>
+        <td class="eq">1 &minus; <span class="frac"><span class="n">1.86&times;10<sup>32</sup></span><span class="d">&omega;<sup>2</sup> + i&omega;(2.619&times;10<sup>13</sup>)</span></span></td>
+        <td class="eq">1 &minus; <span class="frac"><span class="n">1.88&times;10<sup>32</sup></span><span class="d">&omega;<sup>2</sup> + i&omega;(4.057&times;10<sup>13</sup>)</span></span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">&omega;<sub>p</sub><sup>2</sup> used (numerator of &epsilon;): Cu 2.70&times;10<sup>32</sup>, Ag 1.86&times;10<sup>32</sup>, Au 1.88&times;10<sup>32</sup> (rad/s)<sup>2</sup>. The Drude model shows 100 GHz sits deep in the DC-conductivity regime: &omega;&tau; &approx; 0.016 to 0.024 (Cu to Ag), far below 1. The magnitude of &sigma;(&omega;) = &sigma;<sub>dc</sub>/(1 &minus; i&omega;&tau;) is then within about 0.03% of &sigma;<sub>dc</sub>. Its one real AC effect is a small imaginary part (&approx; &omega;&tau;, a couple percent of &sigma;<sub>dc</sub>), which shifts the surface resistance R<sub>s</sub> from its &sigma;<sub>dc</sub> value by only about &omega;&tau;/2 &approx; 1%. The loss curves use this full &sigma;(&omega;), so they stay exact; at 100 GHz it is within about 1% of the &sigma;<sub>dc</sub> value, and the gap grows to roughly 8% by 1 THz (up to about 13% for silver, which has the longest &tau;).</p>
+
+  <!-- ===================== BRIDGE + TABLE 4 ===================== -->
+  <h2>Calculating conductor loss <span class="sub">- from &sigma; to the surface resistance R<sub>s</sub></span></h2>
+  <p class="note">At high frequency the current crowds toward the conductor surface (known as the skin effect; <a href="https://26kimiy.github.io/restraints-of-100ghz/#skin" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">click here for more depth</a>), so the metal presents a frequency-dependent surface resistance R<sub>s</sub> (the effective resistance the signal current sees). That single number is what every transmission-line conductor-loss formula needs <a class="cite" href="#ref3">[3]</a>. With &mu;<sub>0</sub> the permeability of free space (from the constants above) and the Drude conductivity &sigma;(&omega;) from Table 3:</p>
+  <p class="eq" style="margin:14px 0 0;font-size:1.18rem">
+    R<sub>s</sub> = Re <span class="rad-sign">&radic;</span><span class="frac"><span class="n">i&omega;&mu;<sub>0</sub></span><span class="d">&sigma;(&omega;)</span></span>
+    &nbsp;<a class="cite" href="#ref3" style="font-size:.8rem;vertical-align:.4em">[3]</a>
+  </p>
+  <p class="note">At low frequency &sigma;(&omega;) &rarr; &sigma;<sub>dc</sub> and this reduces to the familiar R<sub>s</sub> = &radic;(&pi; f &mu;<sub>0</sub> / &sigma;<sub>dc</sub>) &prop; &radic;f. We evaluate it with the full &sigma;(&omega;) = &sigma;<sub>dc</sub>/(1 &minus; i&omega;&tau;) (&sigma;<sub>dc</sub> and &tau; from Table 2), so it stays exact: at 100 GHz that is within about 1% of the &sigma;<sub>dc</sub> value, growing to roughly 8% by 1 THz (up to about 13% for silver).</p>
+
+  <!-- ===================== TABLE 4 ===================== -->
+  <h2>Table 4. Surface resistance R<sub>s</sub> <span class="sub">- evaluated at 100 GHz</span></h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Quantity</th><th>Symbol</th><th>Equation</th><th class="nc">Cu</th><th class="nc">Ag</th><th class="nc">Au</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>Surface resistance<br><span class="calc">at f = 100 GHz = 1&times;10<sup>11</sup> Hz</span></td><td class="num">R<sub>s</sub></td>
+        <td class="eq">R<sub>s</sub> = Re <span class="rad-sign">&radic;</span><span class="frac"><span class="n">i&omega;&mu;<sub>0</sub></span><span class="d">&sigma;(&omega;)</span></span></td>
+        <td class="num">82.03 m&Omega;</td><td class="num">80.11 m&Omega;</td><td class="num">98.91 m&Omega;</td>
+        <td><a class="cite" href="#ref3">[3]</a></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">Units are milliohms &ldquo;per square&rdquo;. Each R<sub>s</sub> is computed by us from that metal's full Drude &sigma;(&omega;) (Table 3, built from &sigma;<sub>dc</sub> and &tau; in Table 2, which trace back to the CRC resistivity <a class="cite" href="#ref1">[1]</a>) using the surface-resistance relation from Pozar <a class="cite" href="#ref3">[3]</a>, at f = 1&times;10<sup>11</sup> Hz. At 100 GHz this is within about 1% of the DC-limit &radic;(&pi; f &mu;<sub>0</sub> / &sigma;<sub>dc</sub>) (Cu 81.4, Ag 79.2, Au 98.2 m&Omega;); the two diverge above a few hundred GHz. Silver has the lowest R<sub>s</sub> (best conductor) and gold the highest, and that ordering carries straight into the conductor loss.</p>
+  <p class="note">Next: the <a class="cite" href="tem-line-loss.html">line-loss page</a> turns these R<sub>s</sub> values into dB/m for coax, microstrip, and CPW.</p>
+
+  <hr>
+
+  <h2>References</h2>
+  <ol class="refs">
+    <li id="ref1"><span class="lbl">[1]</span> CRC Handbook of Chemistry and Physics, properties of the elements:
+      electrical resistivity &rho;, mass density &rho;<sub>m</sub>, and atomic weight M of Cu, Ag, Au, all in one place.
+      Accessible resistivity table:
+      <a href="https://en.wikipedia.org/wiki/Electrical_resistivity_and_conductivity">en.wikipedia.org/wiki/Electrical_resistivity_and_conductivity</a></li>
+    <li id="ref2"><span class="lbl">[2]</span> N. W. Ashcroft and N. D. Mermin, <i>Solid State Physics</i>, Saunders, 1976,
+      Chapter 1 (the Drude free-electron model and every relation in Table 2). Accessible English reference for the same equations: <a href="https://en.wikipedia.org/wiki/Drude_model">en.wikipedia.org/wiki/Drude_model</a></li>
+    <li id="ref3"><span class="lbl">[3]</span> D. M. Pozar, <i>Microwave Engineering</i>, Wiley: the surface impedance of a good conductor, R<sub>s</sub> = Re&radic;(i&omega;&mu;<sub>0</sub>/&sigma;(&omega;)), which reduces to &radic;(&pi; f &mu;<sub>0</sub> / &sigma;<sub>dc</sub>) at low frequency.</li>
+  </ol>
+
+  <p class="sitefoot">Built by Kimi Yashar, made using Claude.</p>
+
+</div>
+</body>
+</html>
