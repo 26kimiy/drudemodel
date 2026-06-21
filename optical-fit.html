@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optical-fit Drude parameters for Cu, Ag, Au</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{--ink:#16202e;--muted:#56657a;--line:#e3e8ef;--line2:#cdd5e0;--head:#eef2f7;--zebra:#f7fafc;--accent:#0d7d74;--num:#0f1b2d;--cu:#b4531f;--ag:#5b6b7d;--au:#b8902a;}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;padding:42px 22px 90px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);line-height:1.55;background:#fff;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1100px;margin:0 auto}
+  h1{font-size:1.75rem;margin:0 0 6px;letter-spacing:-.01em}
+  h2{font-size:1.22rem;margin:40px 0 4px}
+  h2 .sub{font-weight:400;color:var(--muted);font-size:.9rem}
+  p.intro{color:var(--muted);max-width:880px;margin:6px 0 0}
+  p.note{color:var(--muted);font-size:.87rem;max-width:900px;margin:9px 0 0}
+  p.body{max-width:880px;margin:10px 0 0}
+  ol.body,ul.body{max-width:880px;margin:10px 0 0;padding-left:22px}
+  ol.body li,ul.body li{margin-bottom:7px}
+  .scroll{overflow-x:auto;margin-top:13px;border:1px solid var(--line);border-radius:11px}
+  table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:640px}
+  th,td{padding:10px 14px;text-align:left;vertical-align:middle;border-bottom:1px solid var(--line)}
+  thead th{background:var(--head);border-bottom:2px solid var(--line2);font-size:.79rem;text-transform:uppercase;letter-spacing:.03em;color:#42526a;white-space:nowrap}
+  thead th.nc{text-transform:none}
+  tbody tr:nth-child(even){background:var(--zebra)}
+  tbody tr:hover{background:#edf6f5}
+  td.num{font-variant-numeric:tabular-nums;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;text-align:left;white-space:nowrap;color:var(--num)}
+  td.eq{font-size:1rem;line-height:1.4}
+  .metal{font-weight:700}
+  .hi{background:#fff5e0}
+  a.cite{color:var(--accent);font-weight:600;text-decoration:none;white-space:nowrap}
+  a.cite:hover{text-decoration:underline}
+  sub,sup{font-size:.72em}
+  .frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .2em}
+  .frac>.n{padding:0 .5em 1px;border-bottom:1.6px solid currentColor}
+  .frac>.d{padding:1px .5em 0}
+  .rad-sign{font-size:1.5em;line-height:1;vertical-align:-.14em;margin:0 .06em;font-weight:300}
+  .eqbox{margin:12px 0 0;font-size:1.12rem}
+  .eqcard{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:11px 15px;overflow-x:auto}
+  .eqcard .eqlbl{font-size:.8rem;font-weight:700;color:#42526a;margin:0}
+  .panel{margin-top:16px;border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--zebra)}
+  .ctrls{display:flex;flex-wrap:wrap;gap:18px 28px;align-items:flex-end}
+  .cgrp{display:flex;flex-direction:column;gap:6px}
+  .cgrp .lab{font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#42526a}
+  .seg{display:inline-flex;gap:3px;background:#e7ecf2;border-radius:8px;padding:3px}
+  .seg button{border:none;background:transparent;padding:6px 12px;border-radius:6px;font:inherit;font-size:.84rem;font-weight:600;color:var(--muted);cursor:pointer}
+  .seg button.on{background:var(--accent);color:#fff}
+  .sliders{display:flex;flex-wrap:wrap;gap:14px 30px;margin-top:14px}
+  .sld{display:flex;flex-direction:column;gap:4px;min-width:210px}
+  .sld .slab{font-size:.85rem;color:#42526a}
+  .sld .val{font-family:ui-monospace,monospace;font-size:.84rem;color:var(--accent);font-weight:700}
+  .sld input[type=range]{width:230px;accent-color:var(--accent)}
+  .btn{border:1px solid var(--accent);background:#fff;color:var(--accent);font-weight:700;font-size:.84rem;padding:7px 13px;border-radius:8px;cursor:pointer;margin-top:14px}
+  .btn:hover{background:var(--accent);color:#fff}
+  .misfit{margin-top:12px;font-size:.92rem;color:var(--ink)}
+  .misfit b{font-size:1.1rem;font-family:ui-monospace,monospace;color:#0a5c55}
+  .chartbox{position:relative;height:430px;margin-top:14px}
+  .info{position:relative;border-bottom:1.6px dotted var(--accent);color:var(--accent);font-weight:700;cursor:help;outline:none}
+  .info>.pop{position:absolute;left:0;top:160%;z-index:40;width:290px;background:#0f1b2d;color:#fff;font-weight:400;font-size:.82rem;line-height:1.55;text-align:left;white-space:normal;padding:11px 13px;border-radius:9px;box-shadow:0 12px 30px -8px rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:opacity .13s}
+  .info>.pop.up{top:auto;bottom:160%}
+  .info:hover>.pop,.info:focus>.pop,.info:focus-within>.pop{opacity:1;visibility:visible}
+  .info>.pop b{color:#7fe3d8}
+  .takeaway{margin-top:16px;border:1px solid #bfe0db;border-left:4px solid var(--accent);background:#f0f7f6;border-radius:10px;padding:14px 18px}
+  .takeaway .tkh{margin:0 0 8px;font-weight:700;color:#0a5c55;font-size:1.02rem}
+  .takeaway p{margin:0 0 9px;font-size:.92rem;color:#23313f;line-height:1.6}
+  .takeaway ol{margin:0 0 9px;padding-left:20px}
+  .takeaway li{font-size:.92rem;color:#23313f;line-height:1.6;margin-bottom:7px}
+  .takeaway .bl{margin:0}
+  .refs{margin-top:14px;padding-left:0;list-style:none}
+  .refs li{margin-bottom:13px;font-size:.88rem;color:#33404f;padding:6px 8px;border-radius:7px}
+  .refs li:target{background:#fff5e0}
+  .refs a{color:var(--accent);word-break:break-word}
+  .refs .lbl{font-weight:700;color:var(--ink);margin-right:4px}
+  hr{border:none;border-top:1px solid var(--line);margin:36px 0}
+  .topnav{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:10px 14px;margin:0 0 26px;background:#0f1b2d;border-radius:11px}
+  .topnav .brand{color:#fff;font-weight:700;font-size:.9rem;margin-right:6px}
+  .topnav a{color:#aab8c9;text-decoration:none;font-size:.86rem;font-weight:600;padding:5px 11px;border-radius:7px}
+  .topnav a:hover{color:#fff;background:rgba(255,255,255,.08)}
+  .topnav a.on{color:#fff;background:var(--accent)}
+  .sitefoot{margin:40px 0 0;padding-top:16px;border-top:1px solid var(--line);text-align:center;font-size:.8rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="topnav">
+    <span class="brand">100 GHz with metal</span>
+    <a href="drude-dc.html">1 &middot; Drude parameters</a>
+    <a href="tem-line-loss.html">2 &middot; Line loss</a>
+    <a href="optical-fit.html" class="on">3 &middot; Optical fit</a>
+  </nav>
+
+  <h1>Optical fit: measuring the electrons instead of assuming them</h1>
+  <p class="note"><b>Purpose:</b> this page is here to understand the Drude model better, not to analyze attenuation. The 100 GHz loss numbers live in tab 2.</p>
+  <p class="intro">Tab 1 got the electron numbers by <b>assuming</b> things about the metal. Here we get them a second way, by <b>measuring</b>: we take real data on how each metal responds to light and tune the Drude model until it matches. Then we compare. Where the assumption was right the two agree; where it was wrong they do not.</p>
+
+  <div class="takeaway">
+    <p class="tkh">The one idea on this page</p>
+    <p>&omega;<sub>p</sub> (the plasma frequency) is basically <b>how many electrons are free to move</b>. Tab 1 never measured it; it assumed every atom donates one free electron of ordinary weight, and counted atoms. Here we <b>measure</b> it from light. For silver and gold the assumption turns out right, so the two ways agree (about 9 eV). For copper it is wrong: the measurement (about 7.5 eV) lands well below the assumed count (10.8 eV), because copper's inner d-electrons get in the way and fewer electrons actually act free. That gap is the whole point of this page.</p>
+  </div>
+
+  <h2>So why bother?</h2>
+  <p class="body">Two reasons. First, it is the honest way to pin &omega;<sub>p</sub> down, because it comes from real measurements instead of an assumption. Second, it tells us exactly when the simple model from tab 1 can be trusted (silver and gold) and when it cannot (copper). As a bonus it reveals the bound-electron background &epsilon;<sub>&infin;</sub>, which tab 1 just set to 1.</p>
+
+  <!-- ===================== STEP 1: DEMO ===================== -->
+  <h2>Step 1: watch the fit happen</h2>
+  <p class="note">Want the actual code? The fit was run in Python with a least-squares routine: <a href="https://github.com/26kimiy/drudemodel/blob/main/optical_fit.py" target="_blank" rel="noopener">view optical_fit.py on GitHub</a>.</p>
+  <div class="panel">
+    <div class="ctrls">
+      <div class="cgrp"><span class="lab">Metal</span>
+        <div class="seg" id="demoMetal">
+          <button data-v="Cu" class="on">Cu</button>
+          <button data-v="Ag">Ag</button>
+          <button data-v="Au">Au</button>
+        </div></div>
+    </div>
+    <div class="sliders">
+      <div class="sld">
+        <span class="slab"><span class="info" tabindex="0">&omega;<sub>p</sub><span class="pop"><b>&omega;<sub>p</sub>, plasma frequency.</b> How many electrons are free to move (and how heavy they are). More free electrons means a bigger &omega;<sub>p</sub> and a stronger conductor. On the graph, raising it pushes the curves up and to the right.</span></span> plasma frequency &nbsp; <span class="val" id="vWp"></span></span>
+        <input type="range" id="sWp" min="3" max="14" step="0.05">
+      </div>
+      <div class="sld">
+        <span class="slab"><span class="info" tabindex="0">&gamma;<span class="pop"><b>&gamma;, damping (collision rate).</b> How often a moving electron bumps into something (vibrating atoms, impurities, defects). More bumps means more resistance and a broader, lossier response. 1/&gamma; is the average time between bumps. On the graph it mainly sets how much the metal absorbs (the k curve).</span></span> damping &nbsp; <span class="val" id="vG"></span></span>
+        <input type="range" id="sG" min="2" max="120" step="0.5">
+      </div>
+      <div class="sld">
+        <span class="slab"><span class="info" tabindex="0">&epsilon;<sub>&infin;</sub><span class="pop"><b>&epsilon;<sub>&infin;</sub>, background.</b> The response of the inner bound electrons that do not conduct. The pure free-electron model sets this to 1; real silver and gold need about 4 because their d-electrons add extra screening.</span></span> background &nbsp; <span class="val" id="vE"></span></span>
+        <input type="range" id="sE" min="1" max="10" step="0.05">
+      </div>
+    </div>
+    <button class="btn" id="snap">Snap to best fit</button>
+    <div class="eqcard">
+      <p class="eqlbl">Your three knobs feed these equations, which draw the curves below (&epsilon;<sub>1</sub> is the real part of &epsilon;):</p>
+      <p class="eqbox" style="margin:9px 0 0;font-size:1.05rem;white-space:nowrap">&epsilon;(&omega;) = &epsilon;<sub>&infin;</sub> &minus; <span class="frac"><span class="n">&omega;<sub>p</sub><sup>2</sup></span><span class="d">&omega;<sup>2</sup> + i&gamma;&omega;</span></span> &nbsp;&rarr;&nbsp; n = <span class="rad-sign">&radic;</span><span class="frac"><span class="n">|&epsilon;| + &epsilon;<sub>1</sub></span><span class="d">2</span></span> &nbsp;&middot;&nbsp; k = <span class="rad-sign">&radic;</span><span class="frac"><span class="n">|&epsilon;| &minus; &epsilon;<sub>1</sub></span><span class="d">2</span></span></p>
+    </div>
+    <div class="chartbox"><canvas id="demoChart"></canvas></div>
+    <p class="misfit">Misfit: <b id="misfit"></b> &nbsp;<span class="note" style="display:inline">how far the lines are from the dots, on average. Lower is better; the best fit makes it as small as it can go.</span></p>
+  </div>
+  <p class="note"><b>What to notice:</b> &omega;<sub>p</sub> slides the whole response left and right, &gamma; controls how strongly the metal absorbs (the k curve), and &epsilon;<sub>&infin;</sub> nudges the high-frequency end. There is exactly one combination that makes the lines hug the dots, and that combination is the metal's true Drude numbers. Our computer found it automatically by minimizing the misfit; the sliders just let you feel what it was doing.</p>
+  <p class="note">Data sources: copper and gold use Ordal's far-infrared measurements <a class="cite" href="#r1">[1]</a>; silver has no Ordal set in the database, so it uses Johnson and Christy <a class="cite" href="#r2">[2]</a>, an independent source. All pulled from <a class="cite" href="#r3">[3]</a>.</p>
+
+  <!-- ===================== STEP 2: NUMBERS ===================== -->
+  <h2>Step 2: the numbers we measured</h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Metal</th><th>Data</th><th>Fit window</th><th>&omega;<sub>p</sub> (eV)</th><th><span class="info" tabindex="0" style="font-weight:700">&gamma;<span class="pop">&gamma; is the damping, or collision rate: how often a moving electron bumps into something. Bigger means more resistance. Here it is given as an energy in meV; 1/&gamma; is the average time between bumps.</span></span> (meV)</th><th>&epsilon;<sub>&infin;</sub></th><th>&sigma;<sub>dc</sub> implied</th><th>rms</th></tr></thead>
+    <tbody>
+      <tr><td class="metal">Cu</td><td>Ordal 1987 <a class="cite" href="#r1">[1]</a></td><td class="num">below 1.0 eV</td><td class="num">7.75</td><td class="num">14.9</td><td class="num">1.00</td><td class="num">5.41&times;10<sup>7</sup></td><td class="num">11.2%</td></tr>
+      <tr><td class="metal">Ag</td><td>Johnson &amp; Christy <a class="cite" href="#r2">[2]</a></td><td class="num">below 2.0 eV</td><td class="num">9.17</td><td class="num">19.6</td><td class="num">3.75</td><td class="num">5.77&times;10<sup>7</sup></td><td class="num">0.7%</td></tr>
+      <tr><td class="metal">Au</td><td>Ordal 1987 <a class="cite" href="#r1">[1]</a></td><td class="num">below 1.0 eV</td><td class="num">8.94</td><td class="num">41.3</td><td class="num">3.77</td><td class="num">2.61&times;10<sup>7</sup></td><td class="num">3.2%</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note"><b>What you are looking at:</b> the three knobs we measured for each metal, how good the fit was (rms, smaller is better), and the DC conductivity the fit implies (&epsilon;<sub>0</sub>&omega;<sub>p</sub><sup>2</sup>/&gamma;). That last column is a sanity check against the real measured conductivity (Cu 5.96, Ag 6.30, Au 4.10 &times;10<sup>7</sup>): copper and silver land within about 10%, gold lower.</p>
+
+  <!-- ===================== STEP 5: PUNCHLINE ===================== -->
+  <h2>Step 3: the punchline <span class="sub">- our measurement vs the assumption</span></h2>
+  <p class="body"><b>What you are looking at:</b> for each metal, the value we measured here, next to Ordal's published measurement, next to tab 1's assumed value. <b>What to notice:</b> the &omega;<sub>p</sub> rows (highlighted for copper). Silver and gold agree across all three columns; copper does not, the assumed 10.82 towers over the measured 7.75.</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Metal</th><th>Quantity</th><th>Our optical fit</th><th>Ordal 1985 <a class="cite" href="#r1">[1]</a></th><th>DC-anchored (tab 1)</th></tr></thead>
+    <tbody>
+      <tr><td class="metal" rowspan="2">Cu</td><td>&omega;<sub>p</sub> (eV)</td><td class="num hi">7.75</td><td class="num">7.39</td><td class="num hi">10.82</td></tr>
+      <tr><td>&gamma; (meV)</td><td class="num">14.9</td><td class="num">9.1</td><td class="num">26.4</td></tr>
+      <tr><td class="metal" rowspan="2">Ag</td><td>&omega;<sub>p</sub> (eV)</td><td class="num">9.17</td><td class="num">9.01</td><td class="num">8.99</td></tr>
+      <tr><td>&gamma; (meV)</td><td class="num">19.6</td><td class="num">18.0</td><td class="num">17.2</td></tr>
+      <tr><td class="metal" rowspan="2">Au</td><td>&omega;<sub>p</sub> (eV)</td><td class="num">8.94</td><td class="num">9.03</td><td class="num">9.02</td></tr>
+      <tr><td>&gamma; (meV)</td><td class="num">41.3</td><td class="num">26.7</td><td class="num">26.7</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note"><b>About the &gamma; row:</b> &omega;<sub>p</sub> is the solid result and ours matches Ordal within about 5%. &gamma; is softer and depends on which frequency you probe. Ordal's &gamma; is essentially the value that reproduces the DC conductivity, while ours comes from the optical data, and electrons bump a little more often at higher frequency, so our &gamma; runs slightly larger. Two honest numbers for two situations, not an error.</p>
+
+  <div class="takeaway">
+    <p class="tkh">What to take away</p>
+    <ol>
+      <li><b>The method works.</b> Our fit to real data recovers Ordal's published plasma frequencies (Cu 7.75 vs 7.39, Ag 9.17 vs 9.01, Au 8.94 vs 9.03 eV).</li>
+      <li><b>Copper is the odd one out.</b> Silver's and gold's assumed &omega;<sub>p</sub> (tab 1) matches the measured one, so the simple count works for them. Copper's assumed value (10.8) is about 40% too high, because its d-electrons leave fewer electrons acting free than the count assumes.</li>
+      <li><b>Bound electrons appear as &epsilon;<sub>&infin;</sub> near 4</b> for silver and gold, the inner electrons tab 1 ignored.</li>
+    </ol>
+    <p class="bl"><b>Bottom line:</b> the optical fit is the trustworthy source for &omega;<sub>p</sub>. It does not replace tab 1 for our 100 GHz loss work, because there we need the DC conductivity, which the DC route nails. At 100 GHz the assumed and measured routes give almost the same conductivity; they only pull apart in the infrared, so the simple DC numbers in tabs 1 and 2 are the right ones there.</p>
+  </div>
+
+  <hr>
+  <h2>References</h2>
+  <ol class="refs">
+    <li id="r1"><span class="lbl">[1]</span> M. A. Ordal et al., far-infrared optical properties and Drude fit of the metals.
+      Drude parameters: Ordal et al., <i>Appl. Opt.</i> <b>24</b>, 4493 (1985); copper and gold n, k data: Ordal et al., <i>Appl. Opt.</i> <b>26</b>, 744 (1987).</li>
+    <li id="r2"><span class="lbl">[2]</span> P. B. Johnson and R. W. Christy, Optical constants of the noble metals,
+      <i>Phys. Rev. B</i> <b>6</b>, 4370 (1972). Source of the silver n, k.</li>
+    <li id="r3"><span class="lbl">[3]</span> n, k tables retrieved from the
+      <a href="https://refractiveindex.info">refractiveindex.info</a> database (M. N. Polyanskiy),
+      which hosts the Ordal and Johnson-Christy datasets above.</li>
+  </ol>
+
+  <p class="sitefoot">Built by Kimi Yashar, made using Claude.</p>
+
+</div>
+
+<script>
+(function(){
+  const C=2.99792458e8, HBAR=1.054571817e-34, EV=1.602176634e-19;
+  const COL={Cu:'#b4531f', Ag:'#5b6b7d', Au:'#b8902a'};
+  // measured n,k:  "wl_um,n,k;..."
+  const DATA={
+    Cu:"0.517,1.16,2.64;0.67,0.399,3.97;1,0.538,6.53;1.11,0.57,7.32;1.25,0.62,8.31;1.43,0.699,9.53;1.67,0.816,11.2;2,0.879,13.4;2.11,0.942,14.2;2.22,1,14.9;2.35,1.09,15.8;2.5,1.18,16.8;2.67,1.31,17.9;2.86,1.46,19.1;3.08,1.62,20.6;3.33,1.77,22.3;3.64,1.98,24.2;4,2.25,26.5;4.44,2.58,28.8;5,3.26,33;5.26,3.45,34.5;5.56,3.65,36.3;5.88,3.84,38.3;6.25,4.16,40.7;6.67,4.57,43.3;7.14,5.1,46.2;7.69,5.74,49.5;8.33,6.43,53.2;9.09,7.21,57.7;10,8.31,63;10.5,9,65.9;11.1,9.77,69.1;11.8,10.5,72.6;12.5,11.4,76.5;13.3,12.2,80.8;14.3,13.2,85.6;15.4,13.8,91.1;16.7,14.7,97.7;18.2,15.4,105;20,16.2,115;20.8,16.8,120;21.7,17,124;22.7,17.7,130;23.8,18.4,136;25,19.1,142;26.3,19.5,150;27.8,21,158;29.4,22.1,167;31.3,23.4,178;33.3,25.7,190;35.7,28.5,203;38.5,31.9,219;41.7,36.2,238;45.5,40.9,258;50,50,284;55.6,61.2,313",
+    Ag:"0.1879,1.07,1.212;0.1916,1.1,1.232;0.1953,1.12,1.255;0.1993,1.14,1.277;0.2033,1.15,1.296;0.2073,1.18,1.312;0.2119,1.2,1.325;0.2164,1.22,1.336;0.2214,1.25,1.342;0.2262,1.26,1.344;0.2313,1.28,1.357;0.2371,1.28,1.367;0.2426,1.3,1.378;0.249,1.31,1.389;0.2551,1.33,1.393;0.2616,1.35,1.387;0.2689,1.38,1.372;0.2761,1.41,1.331;0.2844,1.41,1.264;0.2924,1.39,1.161;0.3009,1.34,0.964;0.3107,1.13,0.616;0.3204,0.81,0.392;0.3315,0.17,0.829;0.3425,0.14,1.142;0.3542,0.1,1.419;0.3679,0.07,1.657;0.3815,0.05,1.864;0.3974,0.05,2.07;0.4133,0.05,2.275;0.4305,0.04,2.462;0.4509,0.04,2.657;0.4714,0.05,2.869;0.4959,0.05,3.093;0.5209,0.05,3.324;0.5486,0.06,3.586;0.5821,0.05,3.858;0.6168,0.06,4.152;0.6595,0.05,4.483;0.7045,0.04,4.838;0.756,0.03,5.242;0.8211,0.04,5.727;0.892,0.04,6.312;0.984,0.04,6.992;1.088,0.04,7.795;1.216,0.09,8.828;1.393,0.13,10.1;1.61,0.15,11.85;1.937,0.24,14.08",
+    Au:"0.667,0.219,3.91;0.714,0.177,4.38;0.769,0.179,4.88;0.833,0.188,5.44;0.909,0.205,6.06;1,0.229,6.79;1.05,0.243,7.2;1.11,0.258,7.65;1.18,0.276,8.15;1.25,0.296,8.71;1.33,0.319,9.35;1.43,0.348,10.1;1.54,0.384,10.9;1.67,0.43,11.9;1.82,0.492,13;2,0.581,14.3;2.11,0.64,15.1;2.22,0.71,16;2.35,0.793,17;2.5,0.89,18;2.67,1,19.2;2.86,1.14,20.6;3.08,1.31,22.2;3.33,1.52,24.1;3.64,1.81,26.3;4,2.2,28.9;4.44,2.74,32.1;5,3.5,36;5.71,4.54,41;6.67,6.03,47.4;8,8.29,56.2;10,12.1,69.2;11.1,14.7,76.3;12.5,18.2,84.7;14.3,23,94.9;16.7,29.8,108;20,39.9,124;22.2,46.8,133;25,54.8,144;28.6,64.3,158;33.3,76.4,175;40,93.5,197;44.4,105,210;50,119,225;57.1,137,243;66.7,160,263;80,188,288;100,225,319;125,263,353;154,302,390;200,356,444;286,447,534"
+  };
+  // best-fit numbers in slider units (wp eV, gamma meV, eps_inf), plus fit window (eV)
+  const BEST={
+    Cu:{wp:7.75, g:14.9, e:1.00, emax:1.0},
+    Ag:{wp:9.17, g:19.6, e:3.75, emax:2.0},
+    Au:{wp:8.94, g:41.3, e:3.77, emax:1.0}
+  };
+  const parse=s=>s.split(';').map(t=>{const c=t.split(',');return {wl:+c[0], n:+c[1], k:+c[2]};});
+  const wpRad=ev=>ev*EV/HBAR;
+  const gRad=mev=>mev*1e-3*EV/HBAR;
+  const photonE=wl=>HBAR*2*Math.PI*C/(wl*1e-6)/EV;     // eV
+  function modelNK(wl_um, wp_eV, g_meV, einf){
+    const w=2*Math.PI*C/(wl_um*1e-6), wp=wpRad(wp_eV), g=gRad(g_meV);
+    const e1=einf - wp*wp/(w*w + g*g);
+    const e2=wp*wp*g/(w*(w*w + g*g));
+    const mag=Math.hypot(e1,e2);
+    return {n:Math.sqrt((mag+e1)/2), k:Math.sqrt(Math.max(mag-e1,0)/2)};
+  }
+  function curve(m, wp, g, e){
+    const pts=parse(DATA[m]);
+    const lo=Math.min(...pts.map(d=>d.wl)), hi=Math.max(...pts.map(d=>d.wl)), out=[], N=110;
+    for(let i=0;i<=N;i++){ const wl=lo*Math.pow(hi/lo, i/N); out.push({wl, ...modelNK(wl,wp,g,e)}); }
+    return out;
+  }
+  function misfit(m, wp_eV, g_meV, einf){
+    const wp=wpRad(wp_eV), g=gRad(g_meV); let s=0, nn=0;
+    for(const d of parse(DATA[m])){ if(photonE(d.wl) > BEST[m].emax) continue;
+      const w=2*Math.PI*C/(d.wl*1e-6);
+      const e1d=d.n*d.n-d.k*d.k, e2d=2*d.n*d.k, mag=Math.hypot(e1d,e2d);
+      const e1m=einf - wp*wp/(w*w+g*g), e2m=wp*wp*g/(w*(w*w+g*g));
+      s += ((e1m-e1d)/mag)**2 + ((e2m-e2d)/mag)**2; nn += 2;
+    }
+    return Math.sqrt(s/nn)*100;
+  }
+  const baseOpts=(ytitle)=>({responsive:true,maintainAspectRatio:false,animation:false,
+    scales:{x:{type:'logarithmic',title:{display:true,text:'Wavelength (µm)'}},
+            y:{type:'logarithmic',title:{display:true,text:ytitle}}},
+    plugins:{legend:{labels:{usePointStyle:true,boxWidth:8}},
+      tooltip:{callbacks:{label:(it)=>it.dataset.label+': '+(it.parsed.y).toPrecision(3)+' at '+(it.parsed.x).toPrecision(3)+' µm'}}}});
+
+  // ---------- DEMO chart (sliders) ----------
+  const demo=new Chart(document.getElementById('demoChart'),{type:'scatter',data:{datasets:[]},options:baseOpts('n, k')});
+  const sWp=document.getElementById('sWp'), sG=document.getElementById('sG'), sE=document.getElementById('sE');
+  const vWp=document.getElementById('vWp'), vG=document.getElementById('vG'), vE=document.getElementById('vE');
+  const mfEl=document.getElementById('misfit');
+  const dstate={metal:'Cu'};
+  function drawDemo(){
+    const m=dstate.metal, col=COL[m];
+    const wp=+sWp.value, g=+sG.value, e=+sE.value;
+    vWp.textContent=wp.toFixed(2)+' eV'; vG.textContent=g.toFixed(1)+' meV'; vE.textContent=e.toFixed(2);
+    const pts=parse(DATA[m]), mod=curve(m,wp,g,e);
+    demo.data.datasets=[
+      {label:'n (data)', data:pts.map(d=>({x:d.wl,y:d.n})), backgroundColor:col, borderColor:col, pointRadius:3, showLine:false},
+      {label:'n (your model)', data:mod.map(d=>({x:d.wl,y:d.n})), borderColor:col, borderWidth:2, pointRadius:0, showLine:true},
+      {label:'k (data)', data:pts.map(d=>({x:d.wl,y:d.k})), backgroundColor:'#0d7d74', borderColor:'#0d7d74', pointRadius:3, pointStyle:'rectRot', showLine:false},
+      {label:'k (your model)', data:mod.map(d=>({x:d.wl,y:d.k})), borderColor:'#0d7d74', borderWidth:2, pointRadius:0, showLine:true, borderDash:[6,4]}
+    ];
+    demo.update();
+    mfEl.textContent=misfit(m,wp,g,e).toFixed(1)+'%';
+  }
+  function setBest(m){ sWp.value=BEST[m].wp; sG.value=BEST[m].g; sE.value=BEST[m].e; }
+  [sWp,sG,sE].forEach(s=>s.addEventListener('input',drawDemo));
+  document.getElementById('snap').addEventListener('click',()=>{ setBest(dstate.metal); drawDemo(); });
+  document.getElementById('demoMetal').addEventListener('click',e=>{ if(e.target.dataset.v){
+    dstate.metal=e.target.dataset.v;
+    document.querySelectorAll('#demoMetal button').forEach(b=>b.classList.toggle('on',b===e.target));
+    setBest(dstate.metal); drawDemo();
+  }});
+  setBest('Cu'); drawDemo();
+})();
+</script>
+</body>
+</html>
